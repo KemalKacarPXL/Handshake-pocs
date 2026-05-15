@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    container_name: aon_postgres
+    environment:
+      POSTGRES_DB: aon_db
+      POSTGRES_USER: aon_user
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: aon_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  pgdata:
