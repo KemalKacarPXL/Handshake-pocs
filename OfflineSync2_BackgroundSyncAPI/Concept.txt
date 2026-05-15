@@ -1,0 +1,1 @@
+De browser's Background Sync API zorgt automatisch voor synchronisatie, zelfs als de app gesloten wordt. De browser wacht op een stabiele verbinding en synct dan.
