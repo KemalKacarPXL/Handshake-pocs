@@ -1,0 +1,1 @@
+De browser slaat alles op in IndexedDB en een Service Worker onderschept alle netwerk requests. Bij wifi dropout werkt alles lokaal en synchroniseert automatisch bij herstel.
