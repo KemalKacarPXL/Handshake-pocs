@@ -1,0 +1,1 @@
+De UI toont direct het resultaat zonder te wachten op de server. Op de achtergrond wordt geprobeerd te synchroniseren. Bij wifi dropout wordt elke 30 seconden opnieuw geprobeerd.
