@@ -1,0 +1,91 @@
+name: "Code Quality Analysis"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Run Gradle
+        run: ./gradlew check --no-daemon --continue
+
+      - name: Upload Code Quality Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: code-quality-backend-report
+          path: build/reports/
+
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        if: always()
+        with:
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+
+      # - name: Generate PMD Sarif
+      #   uses: pmd/pmd-github-action@v2
+      #   if: always()
+      #   with:
+      #     version: '7.21.0'
+      #     rulesets: 'pmd-rules.xml'
+      #     sourcePath: 'src'
+      #     analyzeModifiedFilesOnly: false
+      #     uploadSarifReport: true
+
+      # - name: Upload PMD Sarif results
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   if: always()
+      #   with:
+      #     sarif_file: pmd-report.sarif
+      #     category: pmd-java
+
+      - name: Install Frontend modules
+        if: always()
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Run ESLint
+        if: always()
+        run: npx eslint . --cache
+        working-directory: ./frontend
+
+      - name: Generate ESLint HTML Report
+        if: always()
+        run: npx eslint . --cache --format html --output-file build/eslint-report.html
+        working-directory: ./frontend
+
+      - name: Upload ESLint Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: code-quality-frontend-report
+          path: frontend/build/eslint-report.html

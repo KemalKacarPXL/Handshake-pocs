@@ -1,0 +1,71 @@
+plugins {
+	id 'java'
+    id 'pmd'
+    id 'jacoco'
+	id 'org.springframework.boot' version '3.4.2'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'be.pxl'
+version = '0.0.1-SNAPSHOT'
+description = 'AON research project'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+    reports {
+        xml.required = false
+        // for the GitHub badge, please leave as is
+        csv.required = true
+        // for the GitHub Artifacts & your local dev
+        html.required = true
+    }
+}
+
+tasks.register('pmd') {
+    group = 'verification'
+    description = 'Run PMD analysis on all source sets'
+    dependsOn tasks.withType(Pmd) 
+}
+
+pmd {
+    ruleSetFiles = files("pmd-rules.xml")
+    ruleSets = []
+}
+
+tasks.named('check') {
+    dependsOn 'pmd'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.1'
+	runtimeOnly 'org.postgresql:postgresql'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
+}
